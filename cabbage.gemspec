@@ -27,8 +27,7 @@ Gem::Specification.new do |s|
     "cabbage.gemspec",
     "lib/cabbage.rb",
     "test/helper.rb",
-    "test/test_cabbage.rb",
-    "testbed.rb"
+    "test/test_cabbage.rb"
   ]
   s.homepage = "http://github.com/josh-lauer/cabbage"
   s.licenses = ["MIT"]
