@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Josh Lauer"]
   s.date = "2011-09-24"
-  s.description = "More to come."
+  s.description = "A simple parser for Graphvoz '.dot' files."
   s.email = "josh.lauer75@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
