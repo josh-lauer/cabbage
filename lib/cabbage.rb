@@ -17,7 +17,7 @@ module Cabbage
     # a DOTfile.
     def initialize(source = nil)
       @raw_dotfile = ""  # unparsed DOTfile
-      @graph_type = ""         # 
+      @graph_type = ""   # 
       @title = ""
       @header = {}
       @nodes = []
@@ -85,7 +85,7 @@ module Cabbage
         if n[1].include?("=")
           temp[n[0]] = parse_header(n[1], ",")
         else
-          temp[n[0]] = n[1]
+          temp[n[0]] = n[1].strip
         end
       end
       return temp
@@ -119,8 +119,8 @@ module Cabbage
       node_chunk.split("\n").each do |this_line|
         this_connection = {}
         temp = this_line.split("->")
-        this_connection[:start_node] = temp[0].gsub('"', '').gsub('\\', '').strip
-        this_connection[:end_node] = temp[1].split("[")[0].gsub('"', '').gsub('\\', '').strip
+        this_connection[:start_node] = temp[0].gsub('"', '').gsub('\\', '').sub('m_', '').strip
+        this_connection[:end_node] = temp[1].split("[")[0].gsub('"', '').gsub('\\', '').sub('m_', '').strip
         tokens = temp[1].split("[")[1].split("]")[0].split(",")
         tokens.each do |token_string|
           token_pair = token_string.split("=")
