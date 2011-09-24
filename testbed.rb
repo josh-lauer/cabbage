@@ -12,7 +12,6 @@ class Object
 end
 
 def reload
-  load "parser.rb"
   @output = Cabbage.dotfile("ERD.dot")
 end
 

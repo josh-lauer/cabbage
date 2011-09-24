@@ -40,8 +40,7 @@ module Cabbage
           raise
         end
       rescue
-        puts 'Unhandled parser exception, dropping to debugger'
-        debugger
+        puts 'Unhandled parser exception! Parse failed.'
       end
     end 
 
