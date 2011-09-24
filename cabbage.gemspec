@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "cabbage.gemspec",
     "lib/cabbage.rb",
     "test/helper.rb",
     "test/test_cabbage.rb",
