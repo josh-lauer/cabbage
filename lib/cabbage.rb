@@ -17,15 +17,28 @@ module Cabbage
     # a DOTfile.
     def initialize(source = nil)
       @raw_dotfile = ""  # unparsed DOTfile
-      @type = ""         # 
+      @graph_type = ""         # 
       @title = ""
       @header = {}
-      @tables = {}
+      @nodes = []
       @connections = []
       source != nil if parse(source)
     end
 
-    attr_accessor :raw_dotfile, :type, :title, :header, :tables, :connections
+    attr_accessor :raw_dotfile, :graph_type, :title, :header, :nodes, :connections
+
+    # no public methods yet apart from accessors
+
+    # parsing methods below
+    private
+
+    def load_from_file(dotfile_path)
+      @raw_dotfile = IO.read(dotfile_path)
+    end
+
+    def load_from_string(dotfile)
+      @raw_dotfile = dotfile
+    end
 
     def parse(source = nil)
       begin
@@ -44,12 +57,26 @@ module Cabbage
       end
     end 
 
-    def load_from_file(dotfile_path)
-      @raw_dotfile = IO.read(dotfile_path)
-    end
+    # a dotfile has four components:
+    # graph_type, header, nodes, connections
+    def parse_dotfile
+      # the chunk is everything inside '{}'
+      raw_chunk = @raw_dotfile.split("{")[1].split("}")[0].strip
+      # pull out the header
+      raw_header = raw_chunk.match(/([\w\s*=".,\s\[\]_\\]+;)*/m)[0]
+      # find body by chopping header off chunk
+      raw_body = raw_chunk.sub(raw_header, "")
+      # split the body on '>];', which delimits the tables section
+      raw_connections = raw_body.split(">];")[-1].strip
+      # split out the tables section from the body
+      raw_tables = raw_body.split(">];")[0 .. -2].join(">];").strip + " \n>];"
 
-    def load_from_string(dotfile)
-      @raw_dotfile = dotfile
+      # assemble the output hash
+      @graph_type = @raw_dotfile.match(/\A\s*((?:di)?graph)/)[1]
+      @title = @raw_dotfile.match(/\A\s*(?:di)?graph\s*(\w+)/)[1]
+      @header = parse_header(raw_header, ";")
+      @nodes = parse_nodes(raw_tables)
+      @connections = parse_connections(raw_connections)
     end
 
     def parse_header(raw_header, delimiter)
@@ -64,7 +91,7 @@ module Cabbage
       return temp
     end
 
-    def parse_tables(raw_tables)
+    def chop_tables(raw_tables)
       {}.tap do |output|
         raw_tables.scan(/\s*\"*([\w:]+)\"*\s*\[\w+\s*=\s*<(.+?)>\];/m).each do |n|
           output[ n[0].gsub('\"', '').strip ] = n[1].strip
@@ -72,44 +99,38 @@ module Cabbage
       end
     end
 
+    def parse_nodes(raw_tables)
+      result = []
+      chop_tables(raw_tables).each do |name, table|
+        node = {:name => name.sub("m_", "")}
+        node[:fields] = []
+        if table.include?("|")
+          table.split("|")[1].scan(/port="([\w:]+)">[^<]+<[^>]+>(.+?)</m).each do |pair|
+            node[:fields] << { :name => pair[0], :type => pair[1] }
+          end
+        end
+        result << node
+      end
+      result
+    end
+
     def parse_connections(node_chunk)
       output = []
       node_chunk.split("\n").each do |this_line|
         this_connection = {}
         temp = this_line.split("->")
-        this_connection["node_from"] = temp[0].gsub('"', '').gsub('\\', '').strip
-        this_connection["node_to"] = temp[1].split("[")[0].gsub('"', '').gsub('\\', '').strip
+        this_connection[:start_node] = temp[0].gsub('"', '').gsub('\\', '').strip
+        this_connection[:end_node] = temp[1].split("[")[0].gsub('"', '').gsub('\\', '').strip
         tokens = temp[1].split("[")[1].split("]")[0].split(",")
         tokens.each do |token_string|
           token_pair = token_string.split("=")
-          this_connection[token_pair[0].strip.gsub('"', '').gsub('\\', '')] = token_pair[1].strip.gsub('"', '').gsub('\\', '')
+          this_connection[token_pair[0].strip.gsub('"', '').gsub('\\', '').to_sym] = token_pair[1].strip.gsub('"', '').gsub('\\', '')
         end
         output << this_connection
       end
       return output
     end
 
-    # structure:
-    # title, header, tables, footer
-    def parse_dotfile
-      # the chunk is everything inside '{}'
-      raw_chunk = @raw_dotfile.split("{")[1].split("}")[0].strip
-      # pull out the header
-      raw_header = raw_chunk.match(/([\w\s*=".,\s\[\]_\\]+;)*/m)[0]
-      # find body by chopping header off chunk
-      raw_body = raw_chunk.sub(raw_header, "")
-      # split the body on '>];', which delimits the tables section
-      raw_connections = raw_body.split(">];")[-1].strip
-      # split out the tables section from the body
-      raw_tables = raw_body.split(">];")[0 .. -2].join(">];").strip + " \n>];"
-
-      # assemble the output hash
-      @type = @raw_dotfile.match(/\A\s*((?:di)?graph)/)[1]
-      @title = @raw_dotfile.match(/\A\s*(?:di)?graph\s*(\w+)/)[1]
-      @header = parse_header(raw_header, ";")
-      @tables = parse_tables(raw_tables)
-      @connections = parse_connections(raw_connections)
-    end
 
   end
 
