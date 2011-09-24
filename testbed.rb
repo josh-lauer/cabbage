@@ -2,6 +2,7 @@
 # encoding: UTF-8
 require 'irb'
 require 'ruby-debug'
+require 'cabbage'
 
 class Object
   # Return only the methods not present on basic objects
