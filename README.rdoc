@@ -1,19 +1,15 @@
 = cabbage
 
-Description goes here.
+Cabbage parses Graphviz DOT files.
+
+use: Cabbage.dotfile("arg_string")
+where 'arg_string' is either a string containing either a path to a a dotfile
+or a dotfile itself in the form of an '\n' delimited string
 
 == Contributing to cabbage
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+Send me a message if you feel the urge to contribute.
+Fork at will.
 
 == Copyright
-
-Copyright (c) 2011 Your Name. See LICENSE.txt for
-further details.
+Do whatever you want with it.
 
