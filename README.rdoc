@@ -4,9 +4,7 @@ Cabbage is a simple gem that perses Graphviz DOT files.
 
 use:
 install the gem named 'cabbage', and parse a dotfile by invoking 'Cabbage.dotfile(arg)' in your script.
-
-where 'arg' is either a string containing either a path to a a dotfile
-or a dotfile itself in the form of an '\n' delimited string
+(where 'arg' is either a string containing either a path to a a dotfile or a dotfile itself in the form of a string)
 
 == Contributing to cabbage
 Send me a message if you feel the urge to contribute.
