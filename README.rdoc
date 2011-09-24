@@ -1,10 +1,10 @@
 = cabbage
 
-Cabbage is a simple gem that perses Graphviz DOT files.
+Cabbage is a simple gem that parses Graphviz DOT files.
 
 use:
 install the gem named 'cabbage', and parse a dotfile by invoking 'Cabbage.dotfile(arg)' in your script.
-(where 'arg' is either a string containing either a path to a a dotfile or a dotfile itself in the form of a string)
+(where 'arg' is either a string containing either the path to a dotfile or a dot-formatted string)
 
 == Contributing to cabbage
 Send me a message if you feel the urge to contribute.
