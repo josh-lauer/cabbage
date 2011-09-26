@@ -14,8 +14,10 @@ doc
 # jeweler generated
 pkg
 
-# test ERD.dot file
+# TESTING AND DEVELOPMENT STUFF
 ERD.dot
+testbed.rb
+test_mails
 
 # Have editor/IDE/OS specific files you need to ignore? Consider using a global gitignore: 
 #
