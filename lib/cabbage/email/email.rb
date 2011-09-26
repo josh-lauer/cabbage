@@ -26,8 +26,10 @@ module Cabbage
     attr_reader :raw_source, :raw_parsed, :header, :original_keys, :parts, :multipart
 
     def method_missing(m, *args, &block)
-      if @header.keys.include?(m.intern)
-        @header[m.intern]
+      if self.keys.include?(m)
+        self[m]
+      elsif self.key.include?(m.intern)
+        self[m.intern]
       else
         raise "undefined method in Cabbage::Email"
       end
@@ -53,13 +55,9 @@ module Cabbage
       @original_keys = @raw_parsed[:original_keys]
       if header[:content_type].include?("multipart")
         @multipart = true
-        make_flat(@raw_parsed).each do |raw_part|
-          @parts << MimePart.new(raw_part)
-        end
-      else
-        make_flat(@raw_parsed).each do |raw_part|
-          @parts << MimePart.new(raw_part)
-        end    
+      end
+      make_flat(@raw_parsed).each do |raw_part|
+        @parts << MimePart.new(raw_part)
       end
       return true
     end
@@ -71,19 +69,29 @@ module Cabbage
     def [](key)
       if @header.has_key?(key)
         @header[key]
-      elsif key == :body
-        self.body
       elsif self.mime_types.include?(key)
         @parts[self.mime_types.index(key)].body
-      elsif key.class == FixNum
-
+      elsif key.class == String && self.keys.include?(key.intern)
+        self[key.intern]
+      elsif key == :body
+        self.body
+      elsif key == :plaintext && self.mime_types.include?("text/plain")
+        @parts[self.mime_types.index("text/plain")].body
+      elsif key == :html && self.mime_types.include?("text/html")
+        @parts[self.mime_types.index("text/html")].body
+      elsif key == :attachments
+        self.attachments
+      elsif key.class == Fixnum
+        # to be implemented
+        nil
       else
+        # perhaps raise exception here?
         nil
       end
     end
 
     def keys
-      @header.keys + [:body] + self.mime_types 
+      @header.keys + [:body, :html, :plaintext, :attachments] + self.mime_types 
     end
 
     def attachments
@@ -122,12 +130,11 @@ module Cabbage
     ########################## PRIVATE METHODS ##########################
     #####################################################################
 
-    private
+    #private
 
     def make_flat(tree)
       results = []
-
-      if tree[:body].class == Hash
+      if tree[:body].class == Array
         tree[:body].each do |this_part|
           if this_part[:header][:content_type] =~ /^multipart/
             results << make_flat(this_part)
